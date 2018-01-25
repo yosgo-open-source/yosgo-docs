@@ -1,0 +1,10 @@
+{
+  "generator-openapi-repo": {
+    "importExistingSpec": false,
+    "name": "YOSGO",
+    "repo": "yosgo-open-source/yosgo-docs",
+    "splitSpec": false,
+    "samples": false,
+    "installSwaggerUI": true
+  }
+}
