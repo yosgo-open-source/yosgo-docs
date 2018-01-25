@@ -1,223 +1,401 @@
-# This is an **example** API to demontstrate features of OpenAPI specification.
-# It doesn't cover all OpenAPI features. For more full example check out: https://github.com/APIs-guru/petstore_extended
-
 swagger: '2.0'
-# You should specify common part of your endpoints in the following format:
-#   <schemes>://<host><basepath>
 schemes:
-  - http # Remove if your API doesn't support HTTP
-  - https # Remove if your API donsn't support HTTPS
-host: example.com # Replace with your hostname. You can also specify port e.g. example.com:777
-basePath: /api/v1 # Replace with your basePath. Note: SHOULD begin with '/'.
+  - https
+host: yosgo-api-policer.herokuapp.com
+basePath: /_api/v1
 info:
-  # Describe your API here, you can use GFM (https://guides.github.com/features/mastering-markdown) here
   description: |
-    This is an **example** API to demontstrate features of OpenAPI specification
-    # Introduction
-    This specification is intended to to be a good starting point for describint your API in 
-    [OpenAPI/Swagger format](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md).
-    It also demonstrates features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo) tool and 
-    [ReDoc](https://github.com/Rebilly/ReDoc) documentation engine. So beyond the standard OpenAPI syntax we use a few 
-    [vendor extensions](https://github.com/Rebilly/ReDoc/blob/master/docs/redoc-vendor-extensions.md).
-    
-    # OpenAPI Specification
-    The goal of The OpenAPI Specification is to define a standard, language-agnostic interface to REST APIs which
-    allows both humans and computers to discover and understand the capabilities of the service without access to source
-    code, documentation, or through network traffic inspection. When properly defined via OpenAPI, a consumer can 
-    understand and interact with the remote service with a minimal amount of implementation logic. Similar to what
-    interfaces have done for lower-level programming, OpenAPI removes the guesswork in calling the service.
 
-  version: '1.0.0' # Your API version
-  # It can be any string but it is better to use semantic versioning: http://semver.org/
-  # Warning: OpenAPI require version to be string, but without quotation YAML can recognize it as number.
+    # 簡介
+    有鑒於一貫的廣告策略費用不斷升高，YOSGO 致力提供各種行銷工具模組，透過SaaS服務的方式整合至您的產品服務中，讓銷售就是行銷！
 
-  title: Example.com # Replace with your API title
-  # Keep it simple. Don't add "API" or verison at the end of the string.
-
-  termsOfService: 'https://example.com/terms/' # [Optional] Replace with an URL to your ToS
+    上線服務
+    * LINA 揪團模組
+  version: 1.0.0
+  title: YOSGO Docs
+  termsOfService: ''
   contact:
-    email: contact@example.com # [Optional] Replace with your contact email
-    url: 'http://example.com/contact' # [Optional] Replace with link to your contact form
+    email: support@yosgo.com
+    url: 'https:yosgo.com'
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo:
-    url: 'https://apis.guru/openapi-template/logo.png'
+    url: 'https://s3-ap-northeast-1.amazonaws.com/yosgo-images/yosgo-vertical.png'
 externalDocs:
-  description: Find out how to create Github repo for your OpenAPI spec.
-  url: 'https://github.com/Rebilly/generator-openapi-repo'
+  description: 註冊取得YOSGO API KEY
+  url: 'https://dashboard.yosgo.com/signup'
 produces:
-  # List of mime types your API endpoins can return.
-  # This is a global default. You can OVERWRITE it in each specific operation.
-  # Remove the ones not used in your API
   - application/json
   - application/xml
   - text/csv
-  # you can add any mime type your API produces to the list
 consumes:
-  # List of mime types your API endpoins consumes.
-  # This is a global default. You can OVERWRITE it in each specific operation.
-  # Remove the ones not supported by your API
   - application/json
   - application/xml
-  # you can add any mime type your API consumes to the list
-
-# A list of tags used by the specification with additional metadata.
-# The order of the tags can be used to reflect on their order by the parsing tools.
 tags:
-  - name: Echo
-    description: Example echo operations
-  - name: User
-    description: Operations about user
-# Security scheme definitions that can be used across the specification.
+  - name: LINA
+    description: |
+      LINA 是一套整合揪團流程與第三方支付的 API 接口，透過 LINA 你可以快速打造揪團應用程式。
+
+      整體 API 架構如下
+      1. 品牌：可以做為事業體的分類，每個品牌底下會有數個產品
+      2. 產品：即為揪團銷售的產品，產品屬於某個品牌，每個產品建立時需設定該產品的揪團規則
+      3. 揪團：揪團產生時將會套用所屬產品的揪團規則
+      4. 訂單：從揪團中產生訂單，若訂單狀態為已付款，其購買數量就會被算入揪團成團的進度
+      5. 購買人資料：建立訂單時需要帶入訂購人資料，一筆訂單視應用情境可以填入至少一筆或多筆購買人資料。
+
+      金流基礎，目前提供 Ecpay 的線上刷卡，台灣的智付通正在籌備開通中。透過 YOSOGO 管理後台，將你的HaskKey, IV, ID 即可設定 LINA API 的金流接口至你的帳戶中。
+
+      更進一步
+      1. 串接 LINA 需要有 YOSGO-API-KEY，請先至此 **[註冊](https://dashboard.yosgo.com/signup)**，目前僅限公司單位註冊
+      2. 若你是第一次開發揪團應用或是想更進一步了解開發上的細節，請參考 **[LINA 應用程式開發指南]()**
 securityDefinitions:
-  main_auth: # security definition name (you can name it as you want)
-    type: oauth2 # authorization type, one of: oauth2, basic, apiKey
-    # the following options are specific to oauth2 type
+  main_auth:
+    type: oauth2
     authorizationUrl: 'http://example.com/api/oauth/dialog'
     flow: implicit
     scopes:
       'read:users': read users info
       'write:users': modify or remove users
-  api_key: # security definition name (you can name it as you want)
+  api_key:
     type: apiKey
-    # The following options are specific to apiKey type
-    in: header # Where API key will be passed: header or query
-    name: api_key # API key paramteer name
-  basic_auth: # security definition name (you can name it as you want)
+    in: header
+    name: yosgo-api-key
+  basic_auth:
     type: basic
-
-# Holds the relative paths to the individual endpoints. The path is appended to the
-# basePath in order to construct the full URL. 
 paths:
-  '/users/{username}': # path parameter in curly braces
-    # documentation for GET operation for this path
-    
-    # parameters list that are used with each operation for this path
-    parameters:
-      - name: pretty_print
-        in: query # place where paramter is passed: path, header, query or body, formData
-        description: Pretty print response
-        # type of the paramter: string, number, integer, boolean, array
-        type: boolean
-    get:
-      tags:
-        - User
-      
-      # summary is up to 120 symbold but we recommend to be shortest as possible
-      summary: Get user by user name
-      
-      # you can use GFM in operation description too: https://guides.github.com/features/mastering-markdown
-      description: | 
-        Some description of the operation. 
-        You can use `markdown` here.
-      
-      # operationId should be unique across the whole specification
-      operationId: getUserByName
-      
-      # list of parameters for the operation
-      parameters:
-        - name: username
-          in: path
-          description: 'The name that needs to be fetched'
-          required: true
-          type: string
-        - name: with_email
-          in: query
-          description: Filter users without email
-          type: boolean
-      
-      # security schemas applied to this operation
-      security:
-        - main_auth:
-          - 'read:users' # for auth2 provide list of scopes here
-        - api_key: []
-      # overwriting default global produces
-      produces:
-        - application/json
-      responses: # list of responses
-        '200':
-          description: Success
-          schema: # response schema can be specified for each response
-            $ref: '#/definitions/User'
-          examples:
-          # repsonse samples for each type operation produces
-            application/json:
-              username: user1
-              email: user@example.com
-        '403':
-          description: Forbidden
-        '404':
-          description: User not found
-    # documentation for PUT operation for this path
-    put:
-      tags:
-        - User
-      summary: Updated user
-      description: This can only be done by the logged in user.
-      operationId: updateUser
-      produces:
-        - application/json
-      parameters:
-        - name: username
-          in: path
-          description: The name that needs to be updated
-          required: true
-          type: string
-        - in: body
-          name: body
-          description: Updated user object
-          required: true
-          # for body parameter you should specify request schema instead of type
-          schema:
-            $ref: '#/definitions/User'
-      security:
-        - main_auth:
-          - 'write:users'
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Invalid user supplied
-        '404':
-          description: User not found
-  
-  '/echo':
+  /brands:
     post:
       tags:
-        - Echo
-      summary: Echo test
-      description: Receive the exact message you've sent
-      operationId: echo
+        - LINA
+      summary: 建立品牌
+      description: 一段描述
       parameters:
-        - name: message
+        - name: title
           in: body
-          description: 'Echo payload'
           required: true
+          description: 建立的品牌名稱
           schema:
-            type: string
-            example: 'Hello world!'
+            type: object
+            properties:
+              title:
+                type: string
+                description: 一段描述
       security:
         - api_key: []
       responses:
         '200':
-          description: 'OK'
-          examples:
-            'application/json': 'Hello world!'
+          description: 成功建立品牌
           schema:
-            type: string
-          # docuemnt headers for this repsonse
-          headers:
-            X-Rate-Limit: # Header name
-              type: integer # Header value type
-              format: int32 # Header value format
-              description: calls per hour allowed by the user
-            X-Expires-After:
-              type: string
-              format: date-time
-              description: date in UTC when token expires
-# An object to hold data types that can be consumed and produced by operations.
-# These data types can be primitives, arrays or models.
+            $ref: '#/definitions/PostSuccessResponse'
+    get:
+      tags:
+        - LINA
+      summary: 所有品牌
+      description: 查詢帳戶中的所有品牌，回傳帳戶中的所有品牌資料
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                objectId:
+                  type: string
+                  description: 品牌的Id
+                title:
+                  type: string
+                  description: 品牌名稱
+                createdAt:
+                  type: string
+                  description: 建立時間
+  /products:
+    post:
+      tags:
+        - LINA
+      summary: 建立產品
+      description: 一段描述
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: 建立產品所需資料，包含揪團規則設定
+          schema:
+            type: object
+            properties:
+              brandId:
+                type: string
+                description: 產品所屬品牌Id
+                example: kcjSIyGSkK
+              title:
+                type: string
+                description: 產品的名稱
+              description:
+                type: string
+                description: 產品的簡述
+              photo:
+                type: string
+                description: 產品圖片網址，非必填
+              minQuantity:
+                type: number
+                description: 揪團此產品，最低成團數量
+              maxQuantity:
+                type: number
+                description: 揪團此產品，最高購買數量上限，僅為參考值
+              unitPrice:
+                type: number
+                description: 產品價格
+              groupDayLength:
+                type: number
+                description: 揪團天數
+              endDateTime:
+                type: object
+                description: 產品販售截止時間
+                properties:
+                  __type:
+                    type: string
+                    description: 日期固定格式，請輸入字串 Date
+                    example: Date
+                  iso:
+                    type: string
+                    description: 請將日期轉換為 iso 格式
+              isActive:
+                type: boolean
+                description: 請帶'true'
+                example: 'true'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功建立產品
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
+    get:
+      tags:
+        - LINA
+      summary: 所有產品
+      description: 查詢帳戶中的所有品牌，回傳帳戶中的所有產品資料
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: array
+            items:
+              type: object
+              properties:
+                brandId:
+                  type: string
+                  description: 產品所屬品牌Id
+                title:
+                  type: string
+                  description: 產品的名稱
+                description:
+                  type: string
+                  description: 產品的簡述
+                minQuantity:
+                  type: number
+                  description: 最低成團數量
+                maxQuantity:
+                  type: number
+                  description: 最高購買數量上限
+                unitPrice:
+                  type: number
+                  description: 產品價格
+                groupDayLength:
+                  type: number
+                  description: 揪團天數
+                endDateTime:
+                  type: object
+                  description: 產品販售截止時間
+                  properties:
+                    __type:
+                      type: string
+                      description: 日期固定格式
+                      example: Date
+                    iso:
+                      type: string
+                      description: 請將日期轉換為 iso 格式
+                isActive:
+                  type: boolean
+                  description: 產品是否在銷售中
+  '/products/{productId}':
+    get:
+      tags:
+        - LINA
+      summary: 特定產品
+      description: |
+        查詢特定產品的資料，將會返回該產品下方所包含的揪團、揪團內的訂單以及每筆訂單的購買人資料。將會進行伺服器快取 15 分鐘。可以網址後方加上 `?forceUpdate=1` 來取得最新資料。
+      parameters:
+        - name: productId
+          in: path
+          description: 某個產品的id
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              brandId:
+                type: string
+                description: 產品所屬品牌Id
+              title:
+                type: string
+                description: 產品的名稱
+              description:
+                type: string
+                description: 產品的簡述
+              minQuantity:
+                type: number
+                description: 最低成團數量
+              maxQuantity:
+                type: number
+                description: 最高購買數量上限
+              unitPrice:
+                type: number
+                description: 產品價格
+              groupDayLength:
+                type: number
+                description: 揪團天數
+              endDateTime:
+                type: object
+                description: 產品販售截止時間
+                properties:
+                  __type:
+                    type: string
+                    description: 日期固定格式
+                    example: Date
+                  iso:
+                    type: string
+                    description: 請將日期轉換為 iso 格式
+              isActive:
+                type: boolean
+                description: 產品是否在銷售中
+  /groups:
+    post:
+      tags:
+        - LINA
+      summary: 建立揪團
+      description: 一段描述
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: 建立揪團所需資料
+          schema:
+            type: object
+            properties:
+              productId:
+                type: string
+                description: 產品Id
+              notes:
+                type: string
+                description: 該揪團的備註
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
+  '/groups/{groupId}':
+    get:
+      tags:
+        - LINA
+      summary: 特定揪團
+      description: |
+        一段描述
+      parameters:
+        - name: groupId
+          in: path
+          description: 某個揪團的Id
+          required: true
+          type: string
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/GroupWithIdSuccessResponse'
+  /orders:
+    post:
+      tags:
+        - LINA
+      summary: 產生訂單
+      description: 一段描述
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: 建立訂單所需資料
+          schema:
+            type: object
+            properties:
+              order:
+                $ref: '#/definitions/OrderCreateType'
+              registration:
+                $ref: '#/definitions/RegistrationType'
+              extraRegistrations:
+                type: array
+                items:
+                  $ref: '#/definitions/ExtraRegistrationsType'
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/OrderCreateResponseType'
+  /orders/payment:
+    post:
+      tags:
+        - LINA
+      summary: 訂單付款
+      description: 為已建立的訂單付款，並取得綠界支付的表格
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: 訂單付款所需資料
+          schema:
+            type: object
+            properties:
+              orderId:
+                type: string
+                description: 訂單Id
+              next:
+                type: string
+                description: 付款後導向網址
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
+  /registrations:
+    get:
+      tags:
+        - LINA
+      summary: 取得購買人資料
+      description: 取得一筆或是多筆註冊資料
+      parameters:
+        - name: registrationIds
+          in: query
+          description: |
+            query 範例 `?registrationIds=購買人Id1, 購買人Id2, 購買人Id3`
+          required: true
+          type: string
+      security:
+        - api_key: []
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
 definitions:
   Email:
     description: User email address
@@ -244,3 +422,180 @@ definitions:
         example: Smith
       email:
         $ref: '#/definitions/Email'
+  PostSuccessResponse:
+    type: object
+    properties:
+      payload:
+        type: object
+        description: 相關資料的物件
+      message:
+        type: string
+        description: 成功訊息說明
+      status:
+        type: number
+        example: 200
+        description: http 狀態碼
+      error:
+        type: string
+        description: 成功呼叫 api 時，error 值為空字串
+  GroupWithIdSuccessResponse:
+    type: object
+    properties:
+      payload:
+        type: object
+        description: 某個揪團的資料
+        properties:
+          objectId:
+            type: string
+            description: 該揪團的id
+          orders:
+            type: array
+            description: 訂單陣列
+            items:
+              type: object
+              description: 每筆訂單的資訊物件
+          product:
+            type: object
+            description: 產品資料物件
+          note:
+            type: string
+            description: 該揪團的備註欄位
+          isLocked:
+            type: boolean
+            description: 此揪團是否已經結束
+          groupEndDateTime:
+            type: object
+            description: 此揪團截止時間
+          createdAt:
+            type: object
+            description: 此揪團的建立時間
+          updatedAt:
+            type: object
+            description: 此揪團的更新時間
+      message:
+        type: string
+        description: 成功訊息說明
+      status:
+        type: number
+        example: 200
+        description: http 狀態碼
+      error:
+        type: string
+        example: null
+        description: 成功呼叫 api 時，error 值為空字串
+  DateType:
+    type: object
+    properties:
+      __type:
+        type: string
+        example: Date
+        description: 請帶入 Date
+      iso:
+        type: string
+        description: ISO的日期格式字串
+        example: '2018-01-10T11:14:50.298Z'
+  RegistrationType:
+    type: object
+    description: 購買人資料
+    properties:
+      name:
+        type: string
+        description: 購買人姓名
+      phone:
+        type: string
+        description: 購買人手機
+      email:
+        type: string
+        description: 購買人信箱
+      notes:
+        type: string
+        description: 購買人備註欄，可以在此欄位存入此購買人的其他資料
+      address:
+        type: string
+        description: 購買人地址，非必填
+  ExtraRegistrationsType:
+    type: array
+    description: 其他購買人資料，若同一筆訂單有數個購買人資訊，請將第二位以及後續的購買人放置在此，每一位購買人的資訊均為物件，以陣列包裝
+    items:
+      type: object
+      properties:
+        name:
+          type: string
+          description: 其他購買人姓名
+        phone:
+          type: string
+          description: 其他購買人手機
+        email:
+          type: string
+          description: 其他購買人信箱
+        notes:
+          type: string
+          description: 其他購買人備註欄，可以在此欄位存入此購買人的其他資料
+        address:
+          type: string
+          description: 其他購買人地址，非必填
+  OrderCreateType:
+    type: object
+    description: 訂單資訊
+    properties:
+      quantity:
+        type: number
+        description: 訂單的購買數量
+      productId:
+        type: string
+        description: 所屬產品的Id
+      groupId:
+        type: string
+        description: 所屬揪團的Id
+  OrderCreateResponseType:
+    type: object
+    description: 建立訂單的回傳格式
+    properties:
+      payload:
+        type: object
+        description: 訂單相關資料
+        properties:
+          objectId:
+            type: string
+            description: 訂單id
+          payment:
+            type: object
+            description: 訂單的付款資訊
+          product:
+            type: object
+            description: 訂單所屬產品的資訊
+          company:
+            type: object
+            description: 訂單所屬的公司資訊
+          group:
+            type: object
+            description: 訂單所屬的揪團資訊
+          registration:
+            type: object
+            description: 訂單的購買人資訊
+          extraRegistration:
+            type: array
+            description: 其他購買人資訊陣列
+            items:
+              type: object
+              description: 其他購買人資訊物件
+          quantity:
+            type: number
+            description: 訂單購買數量
+          isArchived:
+            type: boolean
+            description: 訂單是否已封存
+          createdAt:
+            $ref: '#/definitions/DateType'
+          updatedAt:
+            $ref: '#/definitions/DateType'
+      message:
+        type: string
+        description: 成功訊息說明
+      status:
+        type: number
+        example: 200
+        description: http 狀態碼
+      error:
+        type: string
+        description: 成功呼叫 api 時，error 值為空字串
