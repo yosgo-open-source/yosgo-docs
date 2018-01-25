@@ -69,7 +69,7 @@ paths:
       tags:
         - LINA
       summary: 建立品牌
-      description: 一段描述
+      description: 相關描述待補充
       parameters:
         - name: title
           in: body
