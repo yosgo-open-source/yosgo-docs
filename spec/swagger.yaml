@@ -7,10 +7,26 @@ info:
   description: |
 
     # 簡介
-    有鑒於一貫的廣告策略費用不斷升高，YOSGO 致力提供各種行銷工具模組，透過SaaS服務的方式整合至您的產品服務中，讓銷售就是行銷！
+    有鑒於廣告費用不斷升高，YOSGO 致力提供各種行銷工具模組，透過SaaS服務的方式整合至您的產品服務中，讓銷售成為你的行銷工具！
 
     上線服務
-    * LINA 揪團模組
+    * [LINA 揪團模組](/#tag/LINA)
+    
+    # 串接準備
+    
+    所有的 API 均使用下方的 request headers 格式，其中 yosgo-api-key 為每個帳號專屬的 API Key。若無 API Key 請先至此 **[註冊](https://dashboard.yosgo.com/signup)**
+
+    |Request header|Description|
+    |--------------|-----------|
+    |Content-Type|application/json|
+    |yosgo-api-key|YOUR_API_KEY|
+    
+    若你想在測試環境中開發請使用：
+    * 測試用 API URL：yosgo-api-policer-dev.herokuapp.com
+    * 測試用 API Key：
+      E6656ABE3BE73DC4AB567870C84EB4286ABA7BF98946E7F843BD5E518819AC150FE01373CB2867CD7BFB27E057C55D7145BACFA1C4FEF9C2061A6586ACF2C3F5
+    * [測試用 YOSGO 管理後台](https://devdashboard.yosgo.com)：帳號demo / 密碼demo
+    
   version: 1.0.0
   title: YOSGO Docs
   termsOfService: ''
@@ -35,92 +51,134 @@ consumes:
 tags:
   - name: LINA
     description: |
-      LINA 是一套整合揪團流程與第三方支付的 API 接口，透過 LINA 你可以快速打造揪團應用程式。
+      LINA 是一套整合揪團流程與第三方支付的 API 接口，適合團體銷售、分銷、揪團、階狀定價... 等 使用情境，透過 LINA 你可以快速打造揪團應用程式或是將揪團流程整合至現有的網站服務中。
+      
+      **運作機制**
+      
+      每項產品均會設定揪團規則，例如單價、揪團天數、最低成團數量...。該產品所對應的揪團則必須在一定期限內達到最低成團數量，若無法在期間內成團 LINA 將啟動退刷機制，自動將尚未成團的揪團款項全額退刷給消費者。
+      
+      **API 主要路徑**
+      1. 品牌 /brands：分類產品的用途
+      2. 產品 /products：揪團的產品
+      3. 揪團 /groups：代表某個產品的揪團
+      4. 訂單 /orders：建立於某個揪團中的訂單
+      
+      **金流機制**
+      
+      LINA 已整合 綠界(Ecpay) 的線上刷卡，串接時只需訂單Id即可取得付款頁面資訊。透過 YOSGO 管理後台使用自己的Key, IV, ID 即可設定 LINA API 的金流接口至你的帳戶中。
+      
+      > 1. 智付通(spgateway)接口籌備中
+      > 2. 由於揪團流程設計考量，暫不支援信用卡以外的付款方式。
 
-      整體 API 架構如下
-      1. 品牌：可以做為事業體的分類，每個品牌底下會有數個產品
-      2. 產品：即為揪團銷售的產品，產品屬於某個品牌，每個產品建立時需設定該產品的揪團規則
-      3. 揪團：揪團產生時將會套用所屬產品的揪團規則
-      4. 訂單：從揪團中產生訂單，若訂單狀態為已付款，其購買數量就會被算入揪團成團的進度
-      5. 購買人資料：建立訂單時需要帶入訂購人資料，一筆訂單視應用情境可以填入至少一筆或多筆購買人資料。
-
-      金流基礎，目前提供 Ecpay 的線上刷卡，台灣的智付通正在籌備開通中。透過 YOSOGO 管理後台，將你的HaskKey, IV, ID 即可設定 LINA API 的金流接口至你的帳戶中。
-
-      更進一步
-      1. 串接 LINA 需要有 YOSGO-API-KEY，請先至此 **[註冊](https://dashboard.yosgo.com/signup)**，目前僅限公司單位註冊
-      2. 若你是第一次開發揪團應用或是想更進一步了解開發上的細節，請參考 **[LINA 應用程式開發指南]()**
-securityDefinitions:
-  main_auth:
-    type: oauth2
-    authorizationUrl: 'http://example.com/api/oauth/dialog'
-    flow: implicit
-    scopes:
-      'read:users': read users info
-      'write:users': modify or remove users
-  api_key:
-    type: apiKey
-    in: header
-    name: yosgo-api-key
-  basic_auth:
-    type: basic
+      **更進一步**
+      1. 若你是第一次開發揪團應用或是想更進一步了解開發上的細節，請參考 **[揪團應用設計指南]()**
+      2. 參考實際串接 LINA 的 **[應用程式案例]()**
 paths:
   /brands:
     post:
       tags:
         - LINA
       summary: 建立品牌
-      description: 相關描述待補充
+      description: |
+        品牌可以視為公司的事業體，用於產品分類。
+        
+        > 1. 品牌名稱請確保唯一性，以免混淆
+        > 2. 透過 API 的方式之外，也能透 YOSGO 的管理後台裡建立品牌
       parameters:
         - name: title
           in: body
+          description: 所有參數均為必填
           required: true
-          description: 建立的品牌名稱
           schema:
             type: object
             properties:
               title:
                 type: string
-                description: 一段描述
-      security:
-        - api_key: []
+                description: 品牌名稱
       responses:
         '200':
-          description: 成功建立品牌
-          schema:
-            $ref: '#/definitions/PostSuccessResponse'
+          description: 成功
+          schema: 
+            type: object
+            properties:
+              payload:
+                type: object
+                description: 建立品牌資訊
+                properties:
+                  objectId:
+                    type: string
+                    description: 品牌Id
+                  title:
+                    type: string
+                    description: 品牌名稱
+                  createdAt:
+                    type: string
+                    description: 建立品牌時間
+                  companyId:
+                    type: string
+                    description: 品牌所屬公司Id
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                description: http 狀態碼
+                example: 200
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
     get:
       tags:
         - LINA
       summary: 所有品牌
-      description: 查詢帳戶中的所有品牌，回傳帳戶中的所有品牌資料
+      description: 查詢帳戶中的所有品牌，回傳品牌資訊陣列
       responses:
         '200':
           description: 成功
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                objectId:
-                  type: string
-                  description: 品牌的Id
-                title:
-                  type: string
-                  description: 品牌名稱
-                createdAt:
-                  type: string
-                  description: 建立時間
+            type: object
+            properties:
+              payload:
+                type: array
+                description: 所有品牌資訊
+                items:
+                  type: object
+                  properties:
+                    objectId:
+                      type: string
+                      description: 品牌的Id
+                    title:
+                      type: string
+                      description: 品牌名稱
+                    createdAt:
+                      type: string
+                      description: 建立時間
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                description: http 狀態碼
+                example: 200
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
   /products:
     post:
       tags:
         - LINA
       summary: 建立產品
-      description: 一段描述
+      description: |
+        建立產品同時定義該產品的揪團規則，以下針對揪團規則相關參數說明
+        
+        > 1. minQuantity: 若該產品的揪團中已付款的數量 >= 此數量時，揪團即為成團
+        > 2. maxQuantity: 僅為參考值，可在應用中作為新增訂單條件之一
+        > 3. groupDayLength: 舉例 2018-01-25 09:00 產生此產品的揪團，本參數設定為3，則此揪團需在 2018-01-28 09:00 前完成揪團
       parameters:
         - name: body
           in: body
           required: true
-          description: 建立產品所需資料，包含揪團規則設定
+          description: 所有參數均為必填
           schema:
             type: object
             properties:
@@ -134,21 +192,19 @@ paths:
               description:
                 type: string
                 description: 產品的簡述
-              photo:
-                type: string
-                description: 產品圖片網址，非必填
               minQuantity:
                 type: number
-                description: 揪團此產品，最低成團數量
+                description: 最低成團數量
               maxQuantity:
                 type: number
-                description: 揪團此產品，最高購買數量上限，僅為參考值
+                description: 數量上限參考值
               unitPrice:
                 type: number
                 description: 產品價格
               groupDayLength:
-                type: number
-                description: 揪團天數
+                type: integer
+                description: 揪團天數，單位(天)
+                minimum: 1
               endDateTime:
                 type: object
                 description: 產品販售截止時間
@@ -162,70 +218,117 @@ paths:
                     description: 請將日期轉換為 iso 格式
               isActive:
                 type: boolean
-                description: 請帶'true'
-                example: 'true'
-      security:
-        - api_key: []
-      responses:
-        '200':
-          description: 成功建立產品
-          schema:
-            $ref: '#/definitions/PostSuccessResponse'
-    get:
-      tags:
-        - LINA
-      summary: 所有產品
-      description: 查詢帳戶中的所有品牌，回傳帳戶中的所有產品資料
+                description: 請帶true
+                example: true
       responses:
         '200':
           description: 成功
           schema:
-            type: array
-            items:
-              type: object
-              properties:
-                brandId:
-                  type: string
-                  description: 產品所屬品牌Id
-                title:
-                  type: string
-                  description: 產品的名稱
-                description:
-                  type: string
-                  description: 產品的簡述
-                minQuantity:
-                  type: number
-                  description: 最低成團數量
-                maxQuantity:
-                  type: number
-                  description: 最高購買數量上限
-                unitPrice:
-                  type: number
-                  description: 產品價格
-                groupDayLength:
-                  type: number
-                  description: 揪團天數
-                endDateTime:
+            type: object
+            properties:
+              payload:
+                type: object
+                description: 建立產品資訊
+                properties: 
+                  objectId: 
+                    type: string
+                    description: 產品Id
+                  title: 
+                    type: string
+                    description: 產品名稱
+                  createdAt:
+                    type: string
+                    description: 產品建立時間
+                  endDateTime:
+                    description: 產品結束販售時間
+                    type: object
+                    properties:
+                      __type:
+                        type: string
+                        example: Date
+                      iso:
+                        type: string
+                        description: ISO的日期格式字串
+                        example: '2018-01-10T11:14:50.298Z'
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                example: 200
+                description: http 狀態碼
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
+    get:
+      tags:
+        - LINA
+      summary: 所有產品
+      description: 查詢帳戶中的所有產品，回傳帳戶中的所有產品資訊
+      responses:
+        '200':
+          description: 成功
+          schema:
+            type: object
+            properties:
+              payload:
+                description: 所有產品資訊
+                type: array
+                items:
                   type: object
-                  description: 產品販售截止時間
                   properties:
-                    __type:
+                    brandId:
                       type: string
-                      description: 日期固定格式
-                      example: Date
-                    iso:
+                      description: 產品所屬品牌Id
+                    title:
                       type: string
-                      description: 請將日期轉換為 iso 格式
-                isActive:
-                  type: boolean
-                  description: 產品是否在銷售中
+                      description: 產品的名稱
+                    description:
+                      type: string
+                      description: 產品的簡述
+                    minQuantity:
+                      type: number
+                      description: 最低成團數量
+                    maxQuantity:
+                      type: number
+                      description: 最高購買數量上限
+                    unitPrice:
+                      type: number
+                      description: 產品價格
+                    groupDayLength:
+                      type: number
+                      description: 揪團天數
+                    endDateTime:
+                      type: object
+                      description: 產品販售截止時間
+                      properties:
+                        __type:
+                          type: string
+                          description: 日期固定格式
+                          example: Date
+                        iso:
+                          type: string
+                          description: 請將日期轉換為 iso 格式
+                    isActive:
+                      type: boolean
+                      description: 產品是否在銷售中
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                example: 200
+                description: http 狀態碼
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
   '/products/{productId}':
     get:
       tags:
         - LINA
       summary: 特定產品
       description: |
-        查詢特定產品的資料，將會返回該產品下方所包含的揪團、揪團內的訂單以及每筆訂單的購買人資料。將會進行伺服器快取 15 分鐘。可以網址後方加上 `?forceUpdate=1` 來取得最新資料。
+        以 productId 查詢特定產品的資料，將會返回該產品下方所包含的揪團、揪團內的訂單以及每筆訂單的購買人資料。此 API cache 15 分鐘。於網址後方query `?forceUpdate=1` 即可取得呼叫當下最新的特定產品資訊。
       parameters:
         - name: productId
           in: path
@@ -236,54 +339,24 @@ paths:
         '200':
           description: 成功
           schema:
-            type: object
-            properties:
-              brandId:
-                type: string
-                description: 產品所屬品牌Id
-              title:
-                type: string
-                description: 產品的名稱
-              description:
-                type: string
-                description: 產品的簡述
-              minQuantity:
-                type: number
-                description: 最低成團數量
-              maxQuantity:
-                type: number
-                description: 最高購買數量上限
-              unitPrice:
-                type: number
-                description: 產品價格
-              groupDayLength:
-                type: number
-                description: 揪團天數
-              endDateTime:
-                type: object
-                description: 產品販售截止時間
-                properties:
-                  __type:
-                    type: string
-                    description: 日期固定格式
-                    example: Date
-                  iso:
-                    type: string
-                    description: 請將日期轉換為 iso 格式
-              isActive:
-                type: boolean
-                description: 產品是否在銷售中
+            $ref: '#/definitions/ProductWithIdSuccessResponse'
   /groups:
     post:
       tags:
         - LINA
       summary: 建立揪團
-      description: 一段描述
+      description: |
+        從某個揪團產品中建立揪團。
+        
+        <br />
+        
+        > **限制條件：** 當該產品已結束販售時，無法再從該產品中建立揪團
       parameters:
         - name: body
           in: body
           required: true
-          description: 建立揪團所需資料
+          description: | 
+            所有參數均為必填，notes 參數非必填
           schema:
             type: object
             properties:
@@ -293,28 +366,49 @@ paths:
               notes:
                 type: string
                 description: 該揪團的備註
-      security:
-        - api_key: []
       responses:
         '200':
           description: 成功
           schema:
-            $ref: '#/definitions/PostSuccessResponse'
+            type: object
+            properties:
+              payload:
+                type: object
+                description: 建立揪團資訊
+                properties:
+                  groupId: 
+                    type: string
+                    description: 揪團Id
+                  createdAt:
+                    type: string
+                    description: 揪團建立時間
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                example: 200
+                description: http 狀態碼
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
   '/groups/{groupId}':
     get:
       tags:
         - LINA
       summary: 特定揪團
       description: |
-        一段描述
+        取的某一個揪團中的資料。包含訂單、對應購買人與付款狀態、產品資料。訂單付款狀態可以透過 `payload.orders[x].payment.result.RtnCode` 是否等於字串 `'1'` 來判斷該訂單是否已經付款成功。
+        
+        <br />
+        
+        > **使用情境：** 在揪團主頁中透過 groupId 取得該揪團的所有資料，即可於揪團頁面中顯示揪團進度、訂購人、付款狀態... etc
       parameters:
         - name: groupId
           in: path
           description: 某個揪團的Id
           required: true
           type: string
-      security:
-        - api_key: []
       responses:
         '200':
           description: 成功
@@ -325,12 +419,19 @@ paths:
       tags:
         - LINA
       summary: 產生訂單
-      description: 一段描述
+      description: | 
+        從揪團中產生訂單。若本訂單已付款，其中 quantity 的參數會納入成團的計算中。舉例如下：
+        
+        <br />
+        
+        > 1. 產品最低成團數量為 4，若本訂單已付款且 quantity 為 2，此揪團的揪團進度為50%，尚未成團
+        > 2. 產品最低成團數量為 4，此揪團包含兩筆訂單，每筆訂單 quantity 為 2，且已付款，此時的揪團進度為50%，揪團成團
+        
       parameters:
         - name: body
           in: body
           required: true
-          description: 建立訂單所需資料
+          description: 所有參數均為必填，extraRegistrations非必填
           schema:
             type: object
             properties:
@@ -342,8 +443,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/definitions/ExtraRegistrationsType'
-      security:
-        - api_key: []
       responses:
         '200':
           description: 成功
@@ -354,12 +453,15 @@ paths:
       tags:
         - LINA
       summary: 訂單付款
-      description: 為已建立的訂單付款，並取得綠界支付的表格
+      description: | 
+        為已建立的訂單付款，並取得綠界支付交易頁面的資訊。若訂單尚未付款可以再次呼叫此 API。
+        
+        next 參數為綠界交易完成後所導向的頁面，綠界訪問 next 網址方式為 `post`，請確保使用的網址能夠以 post 的方式訪問。
       parameters:
         - name: body
           in: body
           required: true
-          description: 訂單付款所需資料
+          description: 所有參數均為必填
           schema:
             type: object
             properties:
@@ -369,8 +471,6 @@ paths:
               next:
                 type: string
                 description: 付款後導向網址
-      security:
-        - api_key: []
       responses:
         '200':
           description: 成功
@@ -381,7 +481,7 @@ paths:
       tags:
         - LINA
       summary: 取得購買人資料
-      description: 取得一筆或是多筆註冊資料
+      description: 取得一筆或是多筆的購買人資料
       parameters:
         - name: registrationIds
           in: query
@@ -389,39 +489,12 @@ paths:
             query 範例 `?registrationIds=購買人Id1, 購買人Id2, 購買人Id3`
           required: true
           type: string
-      security:
-        - api_key: []
       responses:
         '200':
           description: 成功
           schema:
             $ref: '#/definitions/PostSuccessResponse'
 definitions:
-  Email:
-    description: User email address
-    type: string
-    format: email
-    example: john.smith@example.com
-  User:
-    type: object
-    properties:
-      username:
-        description: User supplied username
-        type: string
-        minLength: 4
-        example: John78
-      firstName:
-        description: User first name
-        type: string
-        minLength: 1
-        example: John
-      lastName:
-        description: User last name
-        type: string
-        minLength: 1
-        example: Smith
-      email:
-        $ref: '#/definitions/Email'
   PostSuccessResponse:
     type: object
     properties:
@@ -438,12 +511,27 @@ definitions:
       error:
         type: string
         description: 成功呼叫 api 時，error 值為空字串
+  ProductWithIdSuccessResponse: 
+    type: object
+    properties:
+              payload:
+                $ref: '#/definitions/ProductWithIdType'
+              message:
+                type: string
+                description: 成功訊息說明
+              status:
+                type: number
+                example: 200
+                description: http 狀態碼
+              error:
+                type: string
+                description: 成功呼叫 api 時，error 值為空字串
   GroupWithIdSuccessResponse:
     type: object
     properties:
       payload:
         type: object
-        description: 某個揪團的資料
+        description: 特定揪團資訊
         properties:
           objectId:
             type: string
@@ -455,8 +543,7 @@ definitions:
               type: object
               description: 每筆訂單的資訊物件
           product:
-            type: object
-            description: 產品資料物件
+            $ref: '#/definitions/ProductWithIdType'
           note:
             type: string
             description: 該揪團的備註欄位
@@ -599,3 +686,43 @@ definitions:
       error:
         type: string
         description: 成功呼叫 api 時，error 值為空字串
+  ProductWithIdType: 
+    type: object
+    description: 特定產品資訊
+    properties:
+      brandId:
+        type: string
+        description: 產品所屬品牌Id
+      title:
+        type: string
+        description: 產品的名稱
+      description:
+        type: string
+        description: 產品的簡述
+      minQuantity:
+        type: number
+        description: 最低成團數量
+      maxQuantity:
+        type: number
+        description: 最高購買數量上限
+      unitPrice:
+        type: number
+        description: 產品價格
+      groupDayLength:
+        type: number
+        description: 揪團天數
+      endDateTime:
+        type: object
+        description: 產品販售截止時間
+        properties:
+          __type:
+            type: string
+            description: 日期固定格式
+            example: Date
+          iso:
+            type: string
+            description: 日期為 iso 格式
+      isActive:
+        type: boolean
+        description: 產品是否在銷售中
+  

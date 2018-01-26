@@ -1,13 +1,13 @@
-### How to update docs
+### How to update
 
-Editor: localhost:5000
-Redoc: localhost:3000
+* Browser editor: localhost:5000
+* Redoc viewer: localhost:3000
+* Edit yaml in IDE: /spec/swagger.yaml
+* Update index.html of gh-pages: /web/index.html
 
 ```
 $ npm start
 ```
-
----
 
 ### Update to gh-pages
 
