@@ -1,7 +1,7 @@
 swagger: '2.0'
 schemes:
   - https
-host: yosgo-api-policer.herokuapp.com
+host: api.yosgo.com
 basePath: /_api/v1
 info:
   description: |
@@ -9,24 +9,54 @@ info:
     # 簡介
     有鑒於廣告費用不斷升高，YOSGO 致力提供各種行銷工具模組，透過SaaS服務的方式整合至您的產品服務中，讓銷售成為你的行銷工具！
 
-    上線服務
-    * [LINA 揪團模組](/#tag/LINA)
-    
+    #### 服務架構
+
+    ![服務架構](https://s3-ap-northeast-1.amazonaws.com/yosgo-images/docs-frame.png)
+
+    圖中綠色方塊的步驟說明如下：
+
+    1. 消費者在網頁上執行揪團相關動作。e.g 建立揪團、建立訂單
+    2. 應用程式前端收集相關資料，並將資料送後端server
+    3. 後端server取得資料後，依服務情境呼叫對應 YOSGO API。
+    4. YOSGO API 執行揪團相關動作並與第三方金流溝通
+    5. YOSGO API 回應揪團資料以及付款資料給應用程式後端
+
+    備註：
+
+    > 務必於應用程式後端來呼叫 YOSGO API，並確保 yosgo-api-key 不暴露在網站前台的任一處
+
+    > 透過YOSGO API能輕鬆地操作第三方支付的訂單，已整合綠界科技，智付通籌備中
+
+
+
     # 串接準備
-    
-    所有的 API 均使用下方的 request headers 格式，其中 yosgo-api-key 為每個帳號專屬的 API Key。若無 API Key 請先至此 **[註冊](https://dashboard.yosgo.com/signup)**
+
+    所有的 API 均使用下方的 request headers 格式，其中 yosgo-api-key 為每個帳號專屬的 API Key。您可以至此 **[註冊](https://dashboard.yosgo.com/signup)** 以取得 API Key
 
     |Request header|Description|
     |--------------|-----------|
     |Content-Type|application/json|
     |yosgo-api-key|YOUR_API_KEY|
-    
-    若你想在測試環境中開發請使用：
-    * 測試用 API URL：yosgo-api-policer-dev.herokuapp.com
-    * 測試用 API Key：
+
+    <br />
+
+    #### 正式環境
+
+    若您已開通我們的服務，並準備好正式販售，請使用下方的資源
+
+    * 正式環境 API URL：https://api.yosgo.com/_api/v1
+    * 正式環境 API Key：請至管理後台我的帳戶中取得專用的API Key
+    * [YOSGO 管理後台](https://dashboard.yosgo.com)
+
+    #### 測試環境
+
+    若尚未註冊我們的服務，我們歡迎您使用下方的資源來體驗YOSGO的服務
+
+    * 測試環境 API URL：https://devapi.yosgo.com/_api/v1
+    * 測試環境 API Key：
       E6656ABE3BE73DC4AB567870C84EB4286ABA7BF98946E7F843BD5E518819AC150FE01373CB2867CD7BFB27E057C55D7145BACFA1C4FEF9C2061A6586ACF2C3F5
     * [測試用 YOSGO 管理後台](https://devdashboard.yosgo.com)：帳號demo / 密碼demo
-    
+
   version: 1.0.0
   title: YOSGO Docs
   termsOfService: ''
@@ -38,9 +68,6 @@ info:
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo:
     url: 'https://s3-ap-northeast-1.amazonaws.com/yosgo-images/yosgo-vertical.png'
-externalDocs:
-  description: 註冊取得YOSGO API KEY
-  url: 'https://dashboard.yosgo.com/signup'
 produces:
   - application/json
   - application/xml
@@ -52,27 +79,17 @@ tags:
   - name: LINA
     description: |
       LINA 是一套整合揪團流程與第三方支付的 API 接口，適合團體銷售、分銷、揪團、階狀定價... 等 使用情境，透過 LINA 你可以快速打造揪團應用程式或是將揪團流程整合至現有的網站服務中。
-      
+
       **運作機制**
-      
+
       每項產品均會設定揪團規則，例如單價、揪團天數、最低成團數量...。該產品所對應的揪團則必須在一定期限內達到最低成團數量，若無法在期間內成團 LINA 將啟動退刷機制，自動將尚未成團的揪團款項全額退刷給消費者。
-      
+
       **API 主要路徑**
       1. 品牌 /brands：分類產品的用途
       2. 產品 /products：揪團的產品
       3. 揪團 /groups：代表某個產品的揪團
       4. 訂單 /orders：建立於某個揪團中的訂單
-      
-      **金流機制**
-      
-      LINA 已整合 綠界(Ecpay) 的線上刷卡，串接時只需訂單Id即可取得付款頁面資訊。透過 YOSGO 管理後台使用自己的Key, IV, ID 即可設定 LINA API 的金流接口至你的帳戶中。
-      
-      > 1. 智付通(spgateway)接口籌備中
-      > 2. 由於揪團流程設計考量，暫不支援信用卡以外的付款方式。
 
-      **更進一步**
-      1. 若你是第一次開發揪團應用或是想更進一步了解開發上的細節，請參考 **[揪團應用設計指南]()**
-      2. 參考實際串接 LINA 的 **[應用程式案例]()**
 paths:
   /brands:
     post:
@@ -81,7 +98,7 @@ paths:
       summary: 建立品牌
       description: |
         品牌可以視為公司的事業體，用於產品分類。
-        
+
         > 1. 品牌名稱請確保唯一性，以免混淆
         > 2. 透過 API 的方式之外，也能透 YOSGO 的管理後台裡建立品牌
       parameters:
@@ -98,7 +115,7 @@ paths:
       responses:
         '200':
           description: 成功
-          schema: 
+          schema:
             type: object
             properties:
               payload:
@@ -170,7 +187,7 @@ paths:
       summary: 建立產品
       description: |
         建立產品同時定義該產品的揪團規則，以下針對揪團規則相關參數說明
-        
+
         > 1. minQuantity: 若該產品的揪團中已付款的數量 >= 此數量時，揪團即為成團
         > 2. maxQuantity: 僅為參考值，可在應用中作為新增訂單條件之一
         > 3. groupDayLength: 舉例 2018-01-25 09:00 產生此產品的揪團，本參數設定為3，則此揪團需在 2018-01-28 09:00 前完成揪團
@@ -229,11 +246,11 @@ paths:
               payload:
                 type: object
                 description: 建立產品資訊
-                properties: 
-                  objectId: 
+                properties:
+                  objectId:
                     type: string
                     description: 產品Id
-                  title: 
+                  title:
                     type: string
                     description: 產品名稱
                   createdAt:
@@ -347,15 +364,15 @@ paths:
       summary: 建立揪團
       description: |
         從某個揪團產品中建立揪團。
-        
+
         <br />
-        
+
         > **限制條件：** 當該產品已結束販售時，無法再從該產品中建立揪團
       parameters:
         - name: body
           in: body
           required: true
-          description: | 
+          description: |
             所有參數均為必填，notes 參數非必填
           schema:
             type: object
@@ -376,7 +393,7 @@ paths:
                 type: object
                 description: 建立揪團資訊
                 properties:
-                  groupId: 
+                  groupId:
                     type: string
                     description: 揪團Id
                   createdAt:
@@ -399,9 +416,9 @@ paths:
       summary: 特定揪團
       description: |
         取的某一個揪團中的資料。包含訂單、對應購買人與付款狀態、產品資料。訂單付款狀態可以透過 `payload.orders[x].payment.result.RtnCode` 是否等於字串 `'1'` 來判斷該訂單是否已經付款成功。
-        
+
         <br />
-        
+
         > **使用情境：** 在揪團主頁中透過 groupId 取得該揪團的所有資料，即可於揪團頁面中顯示揪團進度、訂購人、付款狀態... etc
       parameters:
         - name: groupId
@@ -419,14 +436,14 @@ paths:
       tags:
         - LINA
       summary: 產生訂單
-      description: | 
+      description: |
         從揪團中產生訂單。若本訂單已付款，其中 quantity 的參數會納入成團的計算中。舉例如下：
-        
+
         <br />
-        
+
         > 1. 產品最低成團數量為 4，若本訂單已付款且 quantity 為 2，此揪團的揪團進度為50%，尚未成團
         > 2. 產品最低成團數量為 4，此揪團包含兩筆訂單，每筆訂單 quantity 為 2，且已付款，此時的揪團進度為50%，揪團成團
-        
+
       parameters:
         - name: body
           in: body
@@ -453,9 +470,9 @@ paths:
       tags:
         - LINA
       summary: 訂單付款
-      description: | 
+      description: |
         為已建立的訂單付款，並取得綠界支付交易頁面的資訊。若訂單尚未付款可以再次呼叫此 API。
-        
+
         next 參數為綠界交易完成後所導向的頁面，綠界訪問 next 網址方式為 `post`，請確保使用的網址能夠以 post 的方式訪問。
       parameters:
         - name: body
@@ -511,7 +528,7 @@ definitions:
       error:
         type: string
         description: 成功呼叫 api 時，error 值為空字串
-  ProductWithIdSuccessResponse: 
+  ProductWithIdSuccessResponse:
     type: object
     properties:
               payload:
@@ -686,7 +703,7 @@ definitions:
       error:
         type: string
         description: 成功呼叫 api 時，error 值為空字串
-  ProductWithIdType: 
+  ProductWithIdType:
     type: object
     description: 特定產品資訊
     properties:
@@ -725,4 +742,4 @@ definitions:
       isActive:
         type: boolean
         description: 產品是否在銷售中
-  
+
