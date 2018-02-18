@@ -63,9 +63,6 @@ info:
   contact:
     email: support@yosgo.com
     url: 'https:yosgo.com'
-  license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
   x-logo:
     url: 'https://s3-ap-northeast-1.amazonaws.com/yosgo-images/yosgo-vertical.png'
 produces:
