@@ -40,22 +40,15 @@ info:
 
     <br />
 
-    #### 正式環境
-
     若您已開通我們的服務，並準備好正式販售，請使用下方的資源
 
-    * 正式環境 API URL：https://api.yosgo.com/_api/v1
-    * 正式環境 API Key：請至管理後台我的帳戶中取得專用的API Key
-    * [YOSGO 管理後台](https://dashboard.yosgo.com)
-
-    #### 測試環境
-
-    若尚未註冊我們的服務，我們歡迎您使用下方的資源來體驗YOSGO的服務
-
-    * 測試環境 API URL：https://devapi.yosgo.com/_api/v1
-    * 測試環境 API Key：
-      E6656ABE3BE73DC4AB567870C84EB4286ABA7BF98946E7F843BD5E518819AC150FE01373CB2867CD7BFB27E057C55D7145BACFA1C4FEF9C2061A6586ACF2C3F5
-    * [測試用 YOSGO 管理後台](https://devdashboard.yosgo.com)：帳號demo / 密碼demo
+    * API URL：https://api.yosgo.com/_api/v1
+    * API Key：請至管理後台我的帳戶中取得專用的API Key
+    
+    若您尚未註冊您可以也使用測試帳戶
+    * 於此登入測試帳戶的[管理後台](https://dashboard.yosgo.com/login)。帳號：demo@yosgo.com / 密碼：demo
+    * 測試帳戶的 yosgo-api-key 請透過上方資訊登入後取得
+  
 
   version: 1.0.0
   title: YOSGO Docs
