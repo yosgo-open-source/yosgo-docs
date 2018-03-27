@@ -505,6 +505,12 @@ paths:
       tags:
         - LINA
       summary: 取得特定階狀規則
+      parameters:
+        - name: ruleId
+          in: path
+          description: 某個皆狀的id
+          required: true
+          type: string
       responses:
         '200':
           description: 成功
