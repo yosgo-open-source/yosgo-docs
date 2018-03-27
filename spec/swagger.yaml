@@ -44,11 +44,6 @@ info:
 
     * API URL：https://api.yosgo.com/_api/v1
     * API Key：請至管理後台我的帳戶中取得專用的API Key
-    
-    若您尚未註冊您可以也使用測試帳戶
-    * 於此登入測試帳戶的[管理後台](https://dashboard.yosgo.com/login)。帳號：demo@yosgo.com / 密碼：demo
-    * 測試帳戶的 yosgo-api-key 請透過上方資訊登入後取得
-  
 
   version: 1.0.0
   title: YOSGO Docs
@@ -213,20 +208,8 @@ paths:
                 description: 揪團天數，單位(天)
                 minimum: 1
               endDateTime:
-                type: object
-                description: 產品販售截止時間
-                properties:
-                  __type:
-                    type: string
-                    description: 日期固定格式，請輸入字串 Date
-                    example: Date
-                  iso:
-                    type: string
-                    description: 請將日期轉換為 iso 格式
-              isActive:
-                type: boolean
-                description: 請帶true
-                example: true
+                type: string
+                description: 產品販售截止時間(2017/10/25 16:45:00)
       responses:
         '200':
           description: 成功
@@ -316,9 +299,6 @@ paths:
                         iso:
                           type: string
                           description: 請將日期轉換為 iso 格式
-                    isActive:
-                      type: boolean
-                      description: 產品是否在銷售中
               message:
                 type: string
                 description: 成功訊息說明
@@ -365,14 +345,7 @@ paths:
           description: |
             所有參數均為必填，notes 參數非必填
           schema:
-            type: object
-            properties:
-              productId:
-                type: string
-                description: 產品Id
-              notes:
-                type: string
-                description: 該揪團的備註
+            $ref: '#/definitions/GroupsPostRequest'
       responses:
         '200':
           description: 成功
@@ -444,12 +417,6 @@ paths:
             properties:
               order:
                 $ref: '#/definitions/OrderCreateType'
-              registration:
-                $ref: '#/definitions/RegistrationType'
-              extraRegistrations:
-                type: array
-                items:
-                  $ref: '#/definitions/ExtraRegistrationsType'
       responses:
         '200':
           description: 成功
@@ -478,30 +445,82 @@ paths:
               next:
                 type: string
                 description: 付款後導向網址
+              paymentGateway:
+                type: string
+                description: 付款渠道(allpay, spgateway, stripe)
+              payload:
+                type: object
+                description: 渠道相關參數
+                properties:
+                  gatewayParams:
+                    type: object
+                    description: 固定金鑰參數
+                    properties:
+                      key:
+                        type: string
+                        description: HashKey
+                      iv:
+                        type: string
+                        description: HashIv
+                      id:
+                        type: string
+                        description: ID
+                  extraParams:
+                    type: object
+                    description: 渠道額外參數
       responses:
         '200':
           description: 成功
           schema:
             $ref: '#/definitions/PostSuccessResponse'
-  /registrations:
+  /rules:
+    post:
+      tags:
+        - LINA
+      summary: 建立階狀規則
+      parameters:
+        - name: body
+          in: body
+          required: true
+          description: 所有參數均為必填
+          schema:
+            type: object
+            properties:
+              rules:
+                type: object
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
     get:
       tags:
         - LINA
-      summary: 取得購買人資料
-      description: 取得一筆或是多筆的購買人資料
-      parameters:
-        - name: registrationIds
-          in: query
-          description: |
-            query 範例 `?registrationIds=購買人Id1, 購買人Id2, 購買人Id3`
-          required: true
-          type: string
+      summary: 取得所有階狀規則
       responses:
         '200':
           description: 成功
-          schema:
-            $ref: '#/definitions/PostSuccessResponse'
+  /rules/{ruleId}:
+    get:
+      tags:
+        - LINA
+      summary: 取得特定階狀規則
+      responses:
+        '200':
+          description: 成功
 definitions:
+  GroupsPostRequest:
+    type: object
+    properties:
+      productId:
+        type: string
+        description: 產品Id
+      notes:
+        type: string
+        description: 該揪團的備註
+      ruleId:
+        type: string
+        description: 階狀定價規則
   PostSuccessResponse:
     type: object
     properties:
@@ -545,7 +564,7 @@ definitions:
             description: 該揪團的id
           orders:
             type: array
-            description: 訂單陣列
+            description: 訂單列表
             items:
               type: object
               description: 每筆訂單的資訊物件
@@ -560,12 +579,39 @@ definitions:
           groupEndDateTime:
             type: object
             description: 此揪團截止時間
+            properties:
+              __type:
+                type: string
+                example: Date
+                description: Date
+              iso:
+                type: string
+                description: ISO的日期格式字串
+                example: '2018-01-10T11:14:50.298Z'
           createdAt:
             type: object
             description: 此揪團的建立時間
+            properties:
+              __type:
+                type: string
+                example: Date
+                description: Date
+              iso:
+                type: string
+                description: ISO的日期格式字串
+                example: '2018-01-10T11:14:50.298Z'
           updatedAt:
             type: object
             description: 此揪團的更新時間
+            properties:
+              __type:
+                type: string
+                example: Date
+                description: Date
+              iso:
+                type: string
+                description: ISO的日期格式字串
+                example: '2018-01-10T11:14:50.298Z'
       message:
         type: string
         description: 成功訊息說明
@@ -583,12 +629,12 @@ definitions:
       __type:
         type: string
         example: Date
-        description: 請帶入 Date
+        description: 請輸入 Date
       iso:
         type: string
         description: ISO的日期格式字串
         example: '2018-01-10T11:14:50.298Z'
-  RegistrationType:
+  BuyersType:
     type: object
     description: 購買人資料
     properties:
@@ -607,27 +653,6 @@ definitions:
       address:
         type: string
         description: 購買人地址，非必填
-  ExtraRegistrationsType:
-    type: array
-    description: 其他購買人資料，若同一筆訂單有數個購買人資訊，請將第二位以及後續的購買人放置在此，每一位購買人的資訊均為物件，以陣列包裝
-    items:
-      type: object
-      properties:
-        name:
-          type: string
-          description: 其他購買人姓名
-        phone:
-          type: string
-          description: 其他購買人手機
-        email:
-          type: string
-          description: 其他購買人信箱
-        notes:
-          type: string
-          description: 其他購買人備註欄，可以在此欄位存入此購買人的其他資料
-        address:
-          type: string
-          description: 其他購買人地址，非必填
   OrderCreateType:
     type: object
     description: 訂單資訊
@@ -641,6 +666,10 @@ definitions:
       groupId:
         type: string
         description: 所屬揪團的Id
+      buyers:
+        type: array
+        items:
+          $ref: '#/definitions/BuyersType'
   OrderCreateResponseType:
     type: object
     description: 建立訂單的回傳格式
@@ -664,15 +693,6 @@ definitions:
           group:
             type: object
             description: 訂單所屬的揪團資訊
-          registration:
-            type: object
-            description: 訂單的購買人資訊
-          extraRegistration:
-            type: array
-            description: 其他購買人資訊陣列
-            items:
-              type: object
-              description: 其他購買人資訊物件
           quantity:
             type: number
             description: 訂單購買數量
@@ -715,21 +735,3 @@ definitions:
       unitPrice:
         type: number
         description: 產品價格
-      groupDayLength:
-        type: number
-        description: 揪團天數
-      endDateTime:
-        type: object
-        description: 產品販售截止時間
-        properties:
-          __type:
-            type: string
-            description: 日期固定格式
-            example: Date
-          iso:
-            type: string
-            description: 日期為 iso 格式
-      isActive:
-        type: boolean
-        description: 產品是否在銷售中
-
