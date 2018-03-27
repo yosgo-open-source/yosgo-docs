@@ -540,18 +540,18 @@ definitions:
   ProductWithIdSuccessResponse:
     type: object
     properties:
-              payload:
-                $ref: '#/definitions/ProductWithIdType'
-              message:
-                type: string
-                description: 成功訊息說明
-              status:
-                type: number
-                example: 200
-                description: http 狀態碼
-              error:
-                type: string
-                description: 成功呼叫 api 時，error 值為空字串
+      payload:
+        $ref: '#/definitions/ProductWithIdType'
+      message:
+        type: string
+        description: 成功訊息說明
+      status:
+        type: number
+        example: 200
+        description: http 狀態碼
+      error:
+        type: string
+        description: 成功呼叫 api 時，error 值為空字串
   GroupWithIdSuccessResponse:
     type: object
     properties:
