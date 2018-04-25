@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>YOSGO DOCS</title>
+  <!-- needed for adaptive design -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="https://s3-ap-northeast-1.amazonaws.com/yosgo-images/favicon.ico?ver=1">
+  <meta name="og:title" content="YOSGO DOCS">
+  <meta name="og:description" content="YOSGO 技術串接相關文件">
+  <meta name="og:type" content="website">
+  <meta name="og:image" content="https://s3-ap-northeast-1.amazonaws.com/yosgo-images/yosgo-vertical.png">
+
+  <!--
+    ReDoc uses font options from the parent element
+    So override default browser styles
+    -->
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .redoc-markdown-block img {
+      padding: 10px;
+      border: 1px solid rgba(55, 55, 55, 0.3);
+    }
+  </style>
+</head>
+
+<body>
+  <!-- start of facebook sdk -->
+  <script>
+    window.fbAsyncInit = function () {
+      FB.init({
+        appId: '488387194689361',
+        autoLogAppEvents: true,
+        xfbml: true,
+        version: 'v2.2'
+      });
+    };
+    (function (d, s, id) {
+      var js, fjs = d.getElementsByTagName(s)[0];
+      if (d.getElementById(id)) { return; }
+      js = d.createElement(s); js.id = id;
+      js.src = "https://connect.facebook.net/en_US/sdk.js";
+      fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+  </script>
+  <!-- end of facebook sdk -->
+  <!-- start of customer chat -->
+  <div class="fb-customerchat" page_id="484622711936714" minimized="false"></div>
+  <!-- end of customer chat -->
+  <redoc spec-url="./swagger.json">
+  </redoc>
+  <script src="//rebilly.github.io/ReDoc/releases/v1.x.x/redoc.min.js"> </script>
+</body>
+
+</html>
