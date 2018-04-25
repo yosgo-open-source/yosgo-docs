@@ -44,13 +44,16 @@ info:
 
     * API URL：https://api.yosgo.com/_api/v1
     * API Key：請至管理後台我的帳戶中取得專用的API Key
+    
+    備註：
+    > 若使用測試環境 API URL: https://devapi.yosgo.com/_api/v1)
 
   version: 1.0.0
   title: YOSGO Docs
   termsOfService: ''
   contact:
     email: support@yosgo.com
-    url: 'https:yosgo.com'
+    url: 'https://yosgo.com'
   x-logo:
     url: 'https://s3-ap-northeast-1.amazonaws.com/yosgo-images/yosgo-vertical.png'
 produces:
@@ -65,11 +68,11 @@ tags:
     description: |
       LINA 是一套整合揪團流程與第三方支付的 API 接口，適合團體銷售、分銷、揪團、階狀定價... 等 使用情境，透過 LINA 你可以快速打造揪團應用程式或是將揪團流程整合至現有的網站服務中。
 
-      **運作機制**
+      ## 運作機制
 
-      每項產品均會設定揪團規則，例如單價、揪團天數、最低成團數量...。該產品所對應的揪團則必須在一定期限內達到最低成團數量，若無法在期間內成團 LINA 將啟動退刷機制，自動將尚未成團的揪團款項全額退刷給消費者。
+      每項產品均會設定揪團規則，例如單價、揪團天數、成團數量...。該產品所對應的揪團則必須在一定期限內達到成團數量，若無法在期間內成團 LINA 將啟動退刷機制，自動將尚未成團的揪團款項全額退刷給消費者。
 
-      **API 主要路徑**
+      ## API 主要路徑
       1. 品牌 /brands：分類產品的用途
       2. 產品 /products：揪團的產品
       3. 揪團 /groups：代表某個產品的揪團
@@ -196,7 +199,7 @@ paths:
                 description: 產品的簡述
               minQuantity:
                 type: number
-                description: 最低成團數量
+                description: 成團數量
               maxQuantity:
                 type: number
                 description: 數量上限參考值
@@ -207,9 +210,6 @@ paths:
                 type: integer
                 description: 揪團天數，單位(天)
                 minimum: 1
-              endDateTime:
-                type: string
-                description: 產品販售截止時間(2017/10/25 16:45:00)
       responses:
         '200':
           description: 成功
@@ -229,17 +229,6 @@ paths:
                   createdAt:
                     type: string
                     description: 產品建立時間
-                  endDateTime:
-                    description: 產品結束販售時間
-                    type: object
-                    properties:
-                      __type:
-                        type: string
-                        example: Date
-                      iso:
-                        type: string
-                        description: ISO的日期格式字串
-                        example: '2018-01-10T11:14:50.298Z'
               message:
                 type: string
                 description: 成功訊息說明
@@ -253,8 +242,9 @@ paths:
     get:
       tags:
         - LINA
-      summary: 所有產品
-      description: 查詢帳戶中的所有產品，回傳帳戶中的所有產品資訊
+      summary: 查詢所有產品
+      description: |
+        於網址後方帶入`?page=0`，查詢第0 ~ 100筆資料、`?page=1`，查詢第101 ~ 200筆資料、`?page=2`，查詢第201 ~ 300筆資料
       responses:
         '200':
           description: 成功
@@ -278,7 +268,7 @@ paths:
                       description: 產品的簡述
                     minQuantity:
                       type: number
-                      description: 最低成團數量
+                      description: 成團數量
                     maxQuantity:
                       type: number
                       description: 最高購買數量上限
@@ -288,17 +278,6 @@ paths:
                     groupDayLength:
                       type: number
                       description: 揪團天數
-                    endDateTime:
-                      type: object
-                      description: 產品販售截止時間
-                      properties:
-                        __type:
-                          type: string
-                          description: 日期固定格式
-                          example: Date
-                        iso:
-                          type: string
-                          description: 請將日期轉換為 iso 格式
               message:
                 type: string
                 description: 成功訊息說明
@@ -313,7 +292,7 @@ paths:
     get:
       tags:
         - LINA
-      summary: 特定產品
+      summary: 查詢特定產品
       description: |
         以 productId 查詢特定產品的資料，將會返回該產品下方所包含的揪團、揪團內的訂單以及每筆訂單的購買人資料。此 API cache 15 分鐘。於網址後方query `?forceUpdate=1` 即可取得呼叫當下最新的特定產品資訊。
       parameters:
@@ -376,9 +355,9 @@ paths:
     get:
       tags:
         - LINA
-      summary: 特定揪團
+      summary: 查詢特定揪團
       description: |
-        取的某一個揪團中的資料。包含訂單、對應購買人與付款狀態、產品資料。訂單付款狀態可以透過 `payload.orders[x].payment.result.RtnCode` 是否等於字串 `'1'` 來判斷該訂單是否已經付款成功。
+        取的某一個揪團中的資料。包含訂單、對應購買人與付款狀態、產品資料。訂單付款狀態可以透過 `payload.orders[x].payment.formatResult.status` 是否等於字串 `'1'` 來判斷該訂單是否已經付款成功。
 
         <br />
 
@@ -398,15 +377,14 @@ paths:
     post:
       tags:
         - LINA
-      summary: 產生訂單
+      summary: 建立訂單
       description: |
         從揪團中產生訂單。若本訂單已付款，其中 quantity 的參數會納入成團的計算中。舉例如下：
 
         <br />
 
-        > 1. 產品最低成團數量為 4，若本訂單已付款且 quantity 為 2，此揪團的揪團進度為50%，尚未成團
-        > 2. 產品最低成團數量為 4，此揪團包含兩筆訂單，每筆訂單 quantity 為 2，且已付款，此時的揪團進度為50%，揪團成團
-
+        > 1. 產品成團數量為 4，若本訂單已付款且 quantity 為 2，此揪團的揪團進度為50%，尚未成團
+        > 2. 產品成團數量為 4，此揪團包含兩筆訂單，每筆訂單 quantity 為 2，且已付款，此時的揪團進度為50%，揪團成團
       parameters:
         - name: body
           in: body
@@ -422,11 +400,22 @@ paths:
           description: 成功
           schema:
             $ref: '#/definitions/OrderCreateResponseType'
+    get: 
+      tags: 
+        - LINA
+      summary: 查詢所有訂單
+      description: |
+        於網址後方帶入`?page=0`，查詢第0 ~ 100筆資料、`?page=1`，查詢第101 ~ 200筆資料、`?page=2`，查詢第201 ~ 300筆資料
+      responses:
+        '200':
+          description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
   /orders/payment:
     post:
       tags:
         - LINA
-      summary: 訂單付款
+      summary: 建立訂單付款
       description: |
         為已建立的訂單付款，並取得綠界支付交易頁面的資訊。若訂單尚未付款可以再次呼叫此 API。
 
@@ -442,9 +431,6 @@ paths:
               orderId:
                 type: string
                 description: 訂單Id
-              next:
-                type: string
-                description: 付款後導向網址
               paymentGateway:
                 type: string
                 description: 付款渠道(allpay, spgateway, stripe)
@@ -468,6 +454,10 @@ paths:
                   extraParams:
                     type: object
                     description: 渠道額外參數
+                    properties:
+                      next:
+                        type: string
+                        description: 付款後導向網址
       responses:
         '200':
           description: 成功
@@ -478,6 +468,14 @@ paths:
       tags:
         - LINA
       summary: 建立階狀規則
+      description: |
+        用於揪團成團後，您可以提供消費者現金回饋(以信用卡退刷進行)，讓揪團的成員邀請更多成員加入。
+
+        e.g 成團數量為 4，單價 1000，設定階狀規則數量為 8，金額為 900 ，若此團付款數量達 8 時，將於揪團到期時將依購買入量退刷 100 元
+
+        Post rule 時，帶入的資料為物件，其中每對 key value 都是一個階狀定價。
+        
+        key：需要達到的付款數量 / value：實際支付金額
       parameters:
         - name: body
           in: body
@@ -488,6 +486,9 @@ paths:
             properties:
               rules:
                 type: object
+                example: 
+                  8: 900
+                  14: 800
       responses:
         '200':
           description: 成功
@@ -496,15 +497,19 @@ paths:
     get:
       tags:
         - LINA
-      summary: 取得所有階狀規則
+      summary: 查詢所有階狀規則
+      description: |
+        在使用階狀規則時您可以共用相同的階狀規則。使用情境上可以預先建立階狀規則並在建立揪團時應用。
       responses:
         '200':
           description: 成功
+          schema: 
+            $ref: '#/definitions/RulesResponseType'
   '/rules/{ruleId}':
     get:
       tags:
         - LINA
-      summary: 取得特定階狀規則
+      summary: 查詢特定階狀規則
       parameters:
         - name: ruleId
           in: path
@@ -514,6 +519,8 @@ paths:
       responses:
         '200':
           description: 成功
+          schema:
+            $ref: '#/definitions/PostSuccessResponse'
 definitions:
   GroupsPostRequest:
     type: object
@@ -734,10 +741,41 @@ definitions:
         description: 產品的簡述
       minQuantity:
         type: number
-        description: 最低成團數量
+        description: 成團數量
       maxQuantity:
         type: number
         description: 最高購買數量上限
       unitPrice:
         type: number
         description: 產品價格
+  RulesResponseType:
+    type: object
+    properties: 
+      payload:
+        type: array
+        description: 所有階狀定價的資訊
+        items: 
+          type: object
+          properties: 
+            objectId: 
+              type: string
+            rule: 
+              type: object
+              example: 
+                4: 900
+                8: 800
+            createdAt:
+              type: string
+            updatedAt:
+              type: string
+      message:
+        type: string
+        description: 成功訊息說明
+      status:
+        type: number
+        example: 200
+        description: http 狀態碼
+      error:
+        type: string
+        description: 成功呼叫 api 時，error 值為空字串
+
